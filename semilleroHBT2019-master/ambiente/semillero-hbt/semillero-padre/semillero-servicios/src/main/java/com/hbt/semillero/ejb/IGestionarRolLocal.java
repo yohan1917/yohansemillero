@@ -6,6 +6,7 @@ import javax.ejb.Local;
 
 import com.hbt.semillero.dto.ComicDTO;
 import com.hbt.semillero.dto.PersonajeDTO;
+import com.hbt.semillero.dto.RolDTO;
 
 /**
  * Expone los métodos del EJB GestionarPersonaje Las interfaces determinan una
@@ -17,7 +18,7 @@ import com.hbt.semillero.dto.PersonajeDTO;
  *
  */
 @Local
-public interface IGestionarPersonajeLocal {
+public interface IGestionarRolLocal {
 
 	/**
 	 * 
@@ -26,7 +27,7 @@ public interface IGestionarPersonajeLocal {
 	 * @author Yohan Narvaez
 	 * 
 	 */
-	public void crearPersonaje(PersonajeDTO personajeDTO);
+	public void crearRol(RolDTO rolDTO);
 
 	/**
 	 * 
@@ -34,7 +35,7 @@ public interface IGestionarPersonajeLocal {
 	 * 
 	 * @author Yohan Narvaez
 	 */
-	public void modificarPersonaje();
+	public void modificarRol();
 
 	/**
 	 * 
@@ -43,14 +44,14 @@ public interface IGestionarPersonajeLocal {
 	 * @author Yohan Narvaez
 	 * 
 	 */
-	public void eliminarPersonaje();
+	public void eliminarRol();
 
 	/**
 	 * 
 	 * Metodo encargado de retornar la informacion de un personaje
 	 * 
 	 */
-	public void consultarPersonaje();
+	public void consultarRol();
 
 	/**
 	 * 
@@ -58,9 +59,9 @@ public interface IGestionarPersonajeLocal {
 	 * 
 	 * @return
 	 */
-	public List<PersonajeDTO> consultarPersonajes();
+	public List<RolDTO> consultarRoles();
 	
-	public List<PersonajeDTO> consultarPersonajes(Long idComic);
+	public List<RolDTO> consultarRoles(Long idPersonaje);
 	
 
 }

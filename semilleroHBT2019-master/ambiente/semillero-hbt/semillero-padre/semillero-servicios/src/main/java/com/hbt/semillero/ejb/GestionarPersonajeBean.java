@@ -17,7 +17,9 @@ import javax.persistence.PersistenceContext;
 import org.jboss.logging.Logger;
 
 import com.hbt.semillero.dto.ComicDTO;
+import com.hbt.semillero.dto.PersonajeDTO;
 import com.hbt.semillero.entidad.Comic;
+import com.hbt.semillero.entidad.Personaje;
 
 /**
  * <b>Descripción:<b> Clase que determina el bean para realizar las gestion de
@@ -27,7 +29,6 @@ import com.hbt.semillero.entidad.Comic;
  * @version
  */
 @Stateless
-@TransactionManagement(TransactionManagementType.CONTAINER)
 public class GestionarPersonajeBean implements IGestionarPersonajeLocal {
 
 	final static Logger logger = Logger.getLogger(GestionarPersonajeBean.class);
@@ -36,16 +37,17 @@ public class GestionarPersonajeBean implements IGestionarPersonajeLocal {
 	 * Atributo em que se usa para interacturar con el contexto de persistencia.
 	 */
 	@PersistenceContext
-	private EntityManager em;
+	private EntityManager entityManager;
 
 	/**
 	 * 
 	 * Metodo que se utiliza para crear un personaje
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-	public void crearPersonaje() {
+	@Override
+	public void crearPersonaje(PersonajeDTO personajeDTO) {
 		logger.debug("Inicio del metodo crear personaje");
-		
+		Personaje personaje = convertirDTOEntidad(personajeDTO);
+		entityManager.persist(personaje);
 		logger.debug("Fin del metodo crear personaje");
 	}
 
@@ -53,7 +55,7 @@ public class GestionarPersonajeBean implements IGestionarPersonajeLocal {
 	 * 
 	 * Metodo que se utiliza para modificar un personaje
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@Override
 	public void modificarPersonaje() {
 		logger.debug("Inicio del metodo modificar personaje");
 		
@@ -64,7 +66,7 @@ public class GestionarPersonajeBean implements IGestionarPersonajeLocal {
 	 * 
 	 * Metodo que se utiliza para eliminar un personaje
 	 */
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	@Override
 	public void eliminarPersonaje() {
 		logger.debug("Inicio del metodo eliminar personaje");
 		
@@ -82,5 +84,61 @@ public class GestionarPersonajeBean implements IGestionarPersonajeLocal {
 	
 	}
 
+	@Override
+	public List<PersonajeDTO> consultarPersonajes(){
+		
+		String query = "SELEC personaje"
+				+ "FROM Personaje personaje";
+		
+		List<Personaje> listaPersonajes = entityManager.createQuery(query).getResultList();
+		
+		List<PersonajeDTO> listaPersonajesDTO = new ArrayList<>();
+		
+		for (Personaje personaje : listaPersonajes) {
+			listaPersonajesDTO.add(convertirEntidadDTO(personaje));
+		}
+		return listaPersonajesDTO;
+		
+	}
 	
+	@Override
+	public List<PersonajeDTO> consultarPersonajes(Long idComic){
+		String query = "SELECT personaje "
+				+ "FROM Personaje personaje "
+				+ "WHERE personaje.comic.id = :idComic";
+		
+		List<Personaje> listaPersonajes = entityManager.createQuery(query).setParameter("idComic", idComic).getResultList();
+		
+		List<PersonajeDTO> listaPersonajesDTO = new ArrayList<>();
+		
+		for(Personaje personaje : listaPersonajes) {
+			listaPersonajesDTO.add(convertirEntidadDTO(personaje));
+		}
+		
+		return listaPersonajesDTO;	
+	}
+	
+	
+	
+	
+	private Personaje convertirDTOEntidad(PersonajeDTO personajeDTO) {
+		Personaje Personaje = new Personaje();
+		Personaje.setId(personajeDTO.getId());
+		Personaje.setNombre(personajeDTO.getNombre());
+		Personaje.setComic(new Comic());
+		Personaje.getComic().setId(personajeDTO.getIdComic());
+		Personaje.setEstado(personajeDTO.getEstado());
+		Personaje.setSuperPoder(personajeDTO.getSuperPoder());
+		return Personaje;
+	}
+	
+	private PersonajeDTO convertirEntidadDTO(Personaje personaje) {
+		PersonajeDTO PersonajeDTO = new PersonajeDTO();
+		PersonajeDTO.setId(personaje.getId());
+		PersonajeDTO.setNombre(personaje.getNombre());
+		PersonajeDTO.setIdComic(personaje.getComic().getId());
+		PersonajeDTO.setEstado(personaje.getEstado());
+		PersonajeDTO.setSuperPoder(personaje.getSuperPoder());
+		return PersonajeDTO;
+	}
 }
